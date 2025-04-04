@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация и Вход</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Убираем прокрутку */
+        }
+
+        .background {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            background: radial-gradient(125% 125% at 50% 10%, #fff 40%, #63e 100%);
+            z-index: -10;
+        }
+
+        .card {
+            width: 400px;
+            padding: 20px;
+            border-radius: 1rem;
+            background: #000000e5;
+            box-shadow: 0 4px 10px rgba(81, 255, 0, 0.658);
+            color: #ffffff;
+            z-index: 1; /* Карточка поверх фона */
+        }
+
+        .card .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .card .tabs button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .card .tabs button.active {
+            border-color: #25bb2a;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .form-row label {
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .form-row input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-row input.error {
+            border: 2px solid red; /* Красная рамка для ошибки */
+            background-color: #ffe6e6; /* Светло-красный фон */
+        }
+
+        button {
+            background-color: #25bb2a;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2a6d30;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="card">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showForm('register')">Регистрация</button>
+            <button class="tab-button" onclick="showForm('login')">Вход</button>
+        </div>
+        <div id="register" class="form-container active">
+            <h2>Регистрация</h2>
+            <form onsubmit="handleRegistration(event)">
+                <div class="form-row">
+                    <label for="reg-username">Имя пользователя:</label>
+                    <input type="text" id="reg-username" name="username" required>
+                </div>
+                <div class="form-row">
+                    <label for="reg-password">Пароль:</label>
+                    <input type="password" id="reg-password" name="password" required>
+                </div>
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+        </div>
+        <div id="login" class="form-container">
+            <h2>Вход</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-row">
+                    <label for="login-username">Имя пользователя:</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="form-row">
+                    <label for="login-password">Пароль:</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showForm(formId) {
+            // Скрываем все формы
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+
+            // Убираем активный класс с кнопок
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Показываем выбранную форму
+            document.getElementById(formId).classList.add('active');
+
+            // Добавляем активный класс к соответствующей кнопке
+            document.querySelector(`.tab-button[onclick="showForm('${formId}')"]`).classList.add('active');
+        }
+
+        function handleRegistration(event) {
+            event.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+
+            // Сохраняем данные в localStorage
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
+
+            alert('Регистрация успешна!');
+            showForm('login'); // Переключаемся на форму входа
+            document.getElementById('login-username').value = username; // Подставляем имя пользователя
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            // Получаем сохраненные данные
+            const savedUsername = localStorage.getItem('username');
+            const savedPassword = localStorage.getItem('password');
+
+            const passwordInput = document.getElementById('login-password');
+
+            if (username === savedUsername && password === savedPassword) {
+                window.location.href = "http://127.0.0.1:5500/main.html"; // Переход на главную страницу
+            } else {
+                // Подсвечиваем поле пароля красным
+                passwordInput.classList.add('error');
+                setTimeout(() => {
+                    passwordInput.classList.remove('error');
+                }, 2000); // Убираем подсветку через 2 секунды
+            }
+        }
+    </script>
+</body>
+</html> 
